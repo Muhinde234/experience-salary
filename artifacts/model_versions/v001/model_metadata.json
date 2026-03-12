@@ -1,6 +1,6 @@
 {
-  "model_version": "v002",
-  "trained_at_utc": "2026-03-12T06:53:29.571554+00:00",
+  "model_version": "v001",
+  "trained_at_utc": "2026-03-12T06:53:08.794614+00:00",
   "feature_columns": [
     "experience_months"
   ],

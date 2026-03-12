@@ -1,4 +1,6 @@
 {
+  "model_version": "v002",
+  "trained_at_utc": "2026-03-12T06:53:29.571554+00:00",
   "feature_columns": [
     "experience_months"
   ],
@@ -6,17 +8,24 @@
   "best_model": "linear_regression",
   "leaderboard": {
     "linear_regression": {
-      "rmse": 5.2583522830676035,
-      "mae": 4.1621356133144705,
-      "r2": 0.6208258933084713
+      "rmse": 5.065254458765748,
+      "mae": 4.05397785796676,
+      "r2": 0.5971139390831097
     },
     "random_forest": {
-      "rmse": 5.548756358851115,
-      "mae": 4.580152213765066,
-      "r2": 0.5777879469013647
+      "rmse": 5.626402254582849,
+      "mae": 4.5339477773418215,
+      "r2": 0.5029028608558888
     }
   },
-  "train_rows": 800,
+  "train_rows": 798,
   "test_rows": 200,
+  "cleaning_report": {
+    "original_rows": 1000,
+    "cleaned_rows": 998,
+    "rows_removed": 2,
+    "negative_salary_count": 2,
+    "rule": "Removed rows where salary_thousands < 0"
+  },
   "note": "Salary is predicted in thousands."
 }

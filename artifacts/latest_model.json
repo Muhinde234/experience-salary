@@ -1,0 +1,5 @@
+{
+  "version": "v002",
+  "model_path": "artifacts/model_versions/v002/salary_model.joblib",
+  "metadata_path": "artifacts/model_versions/v002/model_metadata.json"
+}

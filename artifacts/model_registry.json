@@ -1,0 +1,22 @@
+{
+  "versions": [
+    {
+      "version": "v001",
+      "trained_at_utc": "2026-03-12T06:53:08.794614+00:00",
+      "model_path": "artifacts/model_versions/v001/salary_model.joblib",
+      "metadata_path": "artifacts/model_versions/v001/model_metadata.json",
+      "best_model": "linear_regression",
+      "rmse": 5.065254458765748,
+      "rows_removed_during_cleaning": 2
+    },
+    {
+      "version": "v002",
+      "trained_at_utc": "2026-03-12T06:53:29.571554+00:00",
+      "model_path": "artifacts/model_versions/v002/salary_model.joblib",
+      "metadata_path": "artifacts/model_versions/v002/model_metadata.json",
+      "best_model": "linear_regression",
+      "rmse": 5.065254458765748,
+      "rows_removed_during_cleaning": 2
+    }
+  ]
+}
