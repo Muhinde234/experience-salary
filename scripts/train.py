@@ -1,9 +1,9 @@
 import json
+from datetime import UTC, datetime
 from pathlib import Path
 
 import joblib
 import numpy as np
-import pandas as pd
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.linear_model import LinearRegression
 from sklearn.metrics import mean_absolute_error, mean_squared_error, r2_score
@@ -11,9 +11,14 @@ from sklearn.model_selection import train_test_split
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
+from data_utils import clean_salary_data, load_raw_data
+
 DATA_PATH = Path("Experience-Salary.csv")
 ARTIFACT_DIR = Path("artifacts")
+MODEL_VERSIONS_DIR = ARTIFACT_DIR / "model_versions"
 REPORT_DIR = Path("reports")
+REGISTRY_PATH = ARTIFACT_DIR / "model_registry.json"
+LATEST_PATH = ARTIFACT_DIR / "latest_model.json"
 
 
 
@@ -26,17 +31,24 @@ def metrics(y_true: np.ndarray, y_pred: np.ndarray) -> dict:
     }
 
 
+def load_registry() -> dict:
+    if not REGISTRY_PATH.exists():
+        return {"versions": []}
+    return json.loads(REGISTRY_PATH.read_text(encoding="utf-8"))
+
+
+def next_version(registry: dict) -> int:
+    return len(registry.get("versions", [])) + 1
+
+
 
 def main() -> None:
     ARTIFACT_DIR.mkdir(parents=True, exist_ok=True)
+    MODEL_VERSIONS_DIR.mkdir(parents=True, exist_ok=True)
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-    df = pd.read_csv(DATA_PATH).rename(
-        columns={
-            "exp(in months)": "experience_months",
-            "salary(in thousands)": "salary_thousands",
-        }
-    )
+    df_raw = load_raw_data(DATA_PATH)
+    df, cleaning_report = clean_salary_data(df_raw)
 
     X = df[["experience_months"]]
     y = df["salary_thousands"]
@@ -68,25 +80,65 @@ def main() -> None:
     best_model_name = min(leaderboard, key=lambda m: leaderboard[m]["rmse"])
     best_model = trained_models[best_model_name]
 
-    joblib.dump(best_model, ARTIFACT_DIR / "salary_model.joblib")
+    registry = load_registry()
+    version_number = next_version(registry)
+    version_id = f"v{version_number:03d}"
+    trained_at = datetime.now(UTC).isoformat()
+    version_dir = MODEL_VERSIONS_DIR / version_id
+    version_dir.mkdir(parents=True, exist_ok=True)
+    model_path = version_dir / "salary_model.joblib"
+    metadata_path = version_dir / "model_metadata.json"
+
+    joblib.dump(best_model, model_path)
 
     metadata = {
+        "model_version": version_id,
+        "trained_at_utc": trained_at,
         "feature_columns": ["experience_months"],
         "target_column": "salary_thousands",
         "best_model": best_model_name,
         "leaderboard": leaderboard,
         "train_rows": int(X_train.shape[0]),
         "test_rows": int(X_test.shape[0]),
+        "cleaning_report": cleaning_report,
         "note": "Salary is predicted in thousands.",
     }
 
+    with open(metadata_path, "w", encoding="utf-8") as f:
+        json.dump(metadata, f, indent=2)
+
+    # Keep backward-compatible latest artifacts for consumers expecting flat paths.
+    joblib.dump(best_model, ARTIFACT_DIR / "salary_model.joblib")
     with open(ARTIFACT_DIR / "model_metadata.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
+
+    registry.setdefault("versions", []).append(
+        {
+            "version": version_id,
+            "trained_at_utc": trained_at,
+            "model_path": str(model_path).replace("\\", "/"),
+            "metadata_path": str(metadata_path).replace("\\", "/"),
+            "best_model": best_model_name,
+            "rmse": leaderboard[best_model_name]["rmse"],
+            "rows_removed_during_cleaning": cleaning_report["rows_removed"],
+        }
+    )
+
+    with open(REGISTRY_PATH, "w", encoding="utf-8") as f:
+        json.dump(registry, f, indent=2)
+
+    latest = {
+        "version": version_id,
+        "model_path": str(model_path).replace("\\", "/"),
+        "metadata_path": str(metadata_path).replace("\\", "/"),
+    }
+    with open(LATEST_PATH, "w", encoding="utf-8") as f:
+        json.dump(latest, f, indent=2)
 
     with open(REPORT_DIR / "model_report.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    print(f"Training complete. Best model: {best_model_name}")
+    print(f"Training complete. Best model: {best_model_name} ({version_id})")
     print(json.dumps(leaderboard, indent=2))
 
 

@@ -2,8 +2,9 @@ import json
 from pathlib import Path
 
 import matplotlib.pyplot as plt
-import pandas as pd
 import seaborn as sns
+
+from data_utils import clean_salary_data, load_raw_data
 
 DATA_PATH = Path("Experience-Salary.csv")
 REPORT_DIR = Path("reports")
@@ -13,13 +14,8 @@ REPORT_DIR = Path("reports")
 def main() -> None:
     REPORT_DIR.mkdir(parents=True, exist_ok=True)
 
-    df = pd.read_csv(DATA_PATH)
-    df = df.rename(
-        columns={
-            "exp(in months)": "experience_months",
-            "salary(in thousands)": "salary_thousands",
-        }
-    )
+    df_raw = load_raw_data(DATA_PATH)
+    df, cleaning_report = clean_salary_data(df_raw)
 
     summary = {
         "rows": int(df.shape[0]),
@@ -27,7 +23,7 @@ def main() -> None:
         "missing_values": df.isna().sum().to_dict(),
         "describe": df.describe().to_dict(),
         "correlation": float(df["experience_months"].corr(df["salary_thousands"])),
-        "negative_salary_count": int((df["salary_thousands"] < 0).sum()),
+        "cleaning": cleaning_report,
     }
 
     with open(REPORT_DIR / "eda_summary.json", "w", encoding="utf-8") as f:

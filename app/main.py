@@ -9,6 +9,7 @@ from pydantic import BaseModel, Field
 ARTIFACT_DIR = Path("artifacts")
 MODEL_PATH = ARTIFACT_DIR / "salary_model.joblib"
 METADATA_PATH = ARTIFACT_DIR / "model_metadata.json"
+LATEST_PATH = ARTIFACT_DIR / "latest_model.json"
 
 app = FastAPI(title="Experience-Salary Predictor", version="1.0.0")
 
@@ -29,11 +30,19 @@ class PredictionResponse(BaseModel):
 
 
 def load_artifacts():
-    if not MODEL_PATH.exists() or not METADATA_PATH.exists():
+    model_path = MODEL_PATH
+    metadata_path = METADATA_PATH
+
+    if LATEST_PATH.exists():
+        latest = json.loads(LATEST_PATH.read_text(encoding="utf-8"))
+        model_path = Path(latest["model_path"])
+        metadata_path = Path(latest["metadata_path"])
+
+    if not model_path.exists() or not metadata_path.exists():
         raise RuntimeError("Model artifacts are missing. Run scripts/train.py first.")
 
-    model = joblib.load(MODEL_PATH)
-    metadata = json.loads(METADATA_PATH.read_text(encoding="utf-8"))
+    model = joblib.load(model_path)
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     return model, metadata
 
 
