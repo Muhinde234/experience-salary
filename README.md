@@ -91,7 +91,19 @@ Example response:
 }
 ```
 
-## 5. Impact tips to make most out of this dataset
+## 5. Run Streamlit app (interactive UI)
+
+```bash
+streamlit run streamlit_app.py
+```
+
+What you get:
+
+- Input experience in months
+- Instant salary prediction
+- Model version, leaderboard, and cleaning report in the UI
+
+## 6. Impact tips to make most out of this dataset
 
 - Convert months to years in dashboards for business readability.
 - Add prediction intervals to show uncertainty, not only point estimates.
