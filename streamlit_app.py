@@ -36,7 +36,7 @@ st.title("Experience to Salary Predictor")
 st.caption("Predict salary from experience using the latest trained model version.")
 
 try:
-    model, metadata = load_model_and_metadata()
+    model, _ = load_model_and_metadata()
 except Exception as exc:
     st.error(str(exc))
     st.stop()
@@ -61,21 +61,3 @@ if st.button("Predict Salary", type="primary"):
     st.metric("Predicted Salary (thousands)", f"{predicted_salary_thousands:,.2f}")
     st.metric("Predicted Salary", f"{predicted_salary:,.2f}")
 
-st.subheader("Model Details")
-st.write(
-    {
-        "model_version": metadata.get("model_version", "n/a"),
-        "best_model": metadata.get("best_model", "n/a"),
-        "trained_at_utc": metadata.get("trained_at_utc", "n/a"),
-        "feature_columns": metadata.get("feature_columns", []),
-    }
-)
-
-if "leaderboard" in metadata:
-    leaderboard_df = pd.DataFrame(metadata["leaderboard"]).T
-    st.subheader("Model Leaderboard")
-    st.dataframe(leaderboard_df, use_container_width=True)
-
-if "cleaning_report" in metadata:
-    st.subheader("Data Cleaning Report")
-    st.write(metadata["cleaning_report"])
