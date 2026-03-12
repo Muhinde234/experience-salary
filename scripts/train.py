@@ -107,7 +107,7 @@ def main() -> None:
     with open(metadata_path, "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
 
-    # Keep backward-compatible latest artifacts for consumers expecting flat paths.
+ 
     joblib.dump(best_model, ARTIFACT_DIR / "salary_model.joblib")
     with open(ARTIFACT_DIR / "model_metadata.json", "w", encoding="utf-8") as f:
         json.dump(metadata, f, indent=2)
