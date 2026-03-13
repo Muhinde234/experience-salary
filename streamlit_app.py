@@ -162,8 +162,6 @@ except Exception as exc:
 
 lb       = metadata["leaderboard"]
 best     = metadata["best_model"]
-version  = metadata["model_version"]
-trained  = metadata["trained_at_utc"][:10]
 cr       = metadata["cleaning_report"]
 
 # ── Sidebar ────────────────────────────────────────────────────────────────────
@@ -171,12 +169,8 @@ with st.sidebar:
     st.markdown('<div class="sidebar-section">Model Info</div>', unsafe_allow_html=True)
     st.markdown(f"""
     <div class="card" style="padding:1rem 1.2rem">
-        <div style="font-size:0.8rem;color:#8b949e">Version</div>
-        <div style="font-size:1.3rem;font-weight:800;color:#58a6ff">{version}</div>
-        <div style="font-size:0.8rem;color:#8b949e;margin-top:.6rem">Algorithm</div>
+        <div style="font-size:0.8rem;color:#8b949e">Algorithm</div>
         <div style="font-size:1rem;font-weight:700;color:#e6edf3">{best.replace('_',' ').title()}</div>
-        <div style="font-size:0.8rem;color:#8b949e;margin-top:.6rem">Trained</div>
-        <div style="font-size:0.9rem;color:#e6edf3">{trained}</div>
     </div>
     """, unsafe_allow_html=True)
 
@@ -237,8 +231,7 @@ with st.sidebar:
 st.markdown(f"""
 <div class="hero">
     <h1>💼 Experience → Salary Predictor</h1>
-    <p>Production ML · {version} &nbsp;·&nbsp; {best.replace('_',' ').title()}
-       &nbsp;·&nbsp; Trained {trained}</p>
+    <p>Predict your salary from experience &nbsp;·&nbsp; {best.replace('_',' ').title()}</p>
 </div>
 """, unsafe_allow_html=True)
 
@@ -362,7 +355,7 @@ for col, (mname, mval) in zip(lb_cols, lb.items()):
 st.markdown("<br>", unsafe_allow_html=True)
 st.markdown("""
 <div style="text-align:center;font-size:0.78rem;color:#484f58;padding:1rem 0 .5rem">
-    Experience-Salary Predictor · AIMS Project · Linear Regression Pipeline
+    Experience-Salary Predictor ·  Linear Regression Pipeline
 </div>
 """, unsafe_allow_html=True)
 
