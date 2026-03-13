@@ -74,7 +74,7 @@ def predict(payload: PredictionRequest) -> PredictionResponse:
     if model is None:
         raise HTTPException(
             status_code=503,
-            detail="Model is not loaded. Run training first and restart API.",
+            detail="Model is not loaded. Please run training first and restart API.",
         )
 
     features = pd.DataFrame(
